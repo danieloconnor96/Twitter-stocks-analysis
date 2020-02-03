@@ -7,18 +7,18 @@ ArticlesRaw = read.csv(file.choose())
 TweetsRaw = read.csv(file.choose())
 
 #convert data frame to corpus
-TweetsCorpus <- VCorpus(VectorSource(TweetsRaw$TweetContent))
+Corpus <- VCorpus(VectorSource(TweetsRaw$TweetContent))
 
 ############ Cleaning ############
-#remove numbers from tweet content column
-tm_map(TweetsCorpus, tolower)
+#convert upper case letters to lower
+CleanCorpus <- tm_map(Corpus, content_transformer(tolower))
 
 #remove punctuation
-tm_map(TweetsCorpus, removePunctuation)
+CleanCorpus <- tm_map(CleanCorpus, content_transformer(removePunctuation))
 
 #convert the corpus back to a data frame
-TweetsCleaned <- data.frame(text = sapply(TweetsCorpus, as.character), stringsAsFactors = FALSE)
+CleanDF <- data.frame(text=unlist(sapply(CleanCorpus, `[`, "content")), stringsAsFactors=F)
 
-#######################################################################
-#tested tolower function above - currently not working
-# when converted back to dataframe, text still contains caps
+
+
+#rm("TweetsCorpusCleaned", "TweetsCorpus", "ArticlesRaw")
