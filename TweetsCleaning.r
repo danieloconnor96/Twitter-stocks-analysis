@@ -19,6 +19,11 @@ CleanCorpus <- tm_map(CleanCorpus, content_transformer(removePunctuation))
 #convert the corpus back to a data frame
 CleanDF <- data.frame(text=unlist(sapply(CleanCorpus, `[`, "content")), stringsAsFactors=F)
 
+#Change TweetContent column to the cleaned version
+TweetsClean <- TweetsRaw
+TweetsClean$TweetContent <- CleanDF
 
 
-#rm("TweetsCorpusCleaned", "TweetsCorpus", "ArticlesRaw")
+#write.csv(TweetsClean ,"Path where you'd like to export the DataFrame\\File Name.csv", row.names = FALSE)
+  
+#rm("TweetsRawCopy")
