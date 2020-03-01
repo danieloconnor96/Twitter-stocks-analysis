@@ -7,21 +7,37 @@ library(textreg)
 #Package for str_replace
 install.packages("stringr")
 library(stringr)
-install.packages("dplyr")
 library(dplyr)
+install.packages("plyr")
+library(plyr)
 #################################
 
-ArticlesRaw3 = read.csv(file.choose(), stringsAsFactors = FALSE)
+ArticlesRaw3 = read.csv(file.choose(), stringsAsFactors = FALSE, encoding="UTF-8")
 
-#filter by articles about Tesla/Musk
+#filter by articles that mention Tesla/Musk
 filteredArticles1 <- dplyr::filter(ArticlesRaw1, grepl('Tesla|Elon Musk', content))
 filteredArticles2 <- dplyr::filter(ArticlesRaw2, grepl('Tesla|Elon Musk', content))
 filteredArticles3 <- dplyr::filter(ArticlesRaw3, grepl('Tesla|Elon Musk', content))
 
-###### before running below functions - combine the 3 article objects
+#Bind the 3 dfs
+ArticlesBinded  <- rbind.fill(filteredArticles1,filteredArticles2,filteredArticles3)
+
+#add unique ID column
+ArticlesBinded$ArticleID <- 1:nrow(ArticlesBinded)
+
+#set df vars
+ArticleID       <- ArticlesBinded$ArticleID
+ArticleDate     <- ArticlesBinded$date
+Title           <- ArticlesBinded$title
+Publication     <- ArticlesBinded$publication
+Author          <- ArticlesBinded$author
+ArticleContent  <- ArticlesBinded$content
+
+#Create DF 
+NewsArticles    <- data.frame(ArticleID, ArticleDate, Title, Publication, Author, ArticleContent, stringsAsFactors=FALSE)
 
 #store article content column column in var
-Column    <- filteredArticles1$content
+Column    <- NewsArticles$ArticleContent
 
 #convert content column to corpus for tm use
 Corpus    <- VCorpus(VectorSource(Column))
@@ -38,15 +54,15 @@ Corpus    <- tm_map(Corpus, content_transformer(removeNumbers))
 Corpus    <- tm_map(Corpus, content_transformer(removePunctuation))
 
 #convert the corpus back to character vector
-ArticleContentVector <- convert.tm.to.character(Corpus)
+ArticleContentClean <- convert.tm.to.character(Corpus)
+
 
 #Replace TweetContent column with the clean version
-filteredArticles1$content <- ArticleContentVector
-
-
+NewsArticles$ArticleContent <- ArticleContentClean
 
 
 ############# CSV export ###############
+write.table(NewsArticles, file="Articles_Clean_final.csv", sep=",", row.names=FALSE)
 
 
 
