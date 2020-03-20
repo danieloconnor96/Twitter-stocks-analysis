@@ -9,12 +9,12 @@ install.packages("stringr")
 library(stringr)
 #################################
 
-TweetsRaw = read.csv(file.choose(), stringsAsFactors = FALSE)
+TweetsRaw   <- read.csv(file.choose(), stringsAsFactors = FALSE)
 TweetsClean <- TweetsRaw
 
 ############ Cleaning ############
 #store tweet column in var
-Column <- TweetsRaw$TweetContent
+Column    <- TweetsRaw$TweetContent
 #Remove RT header
 Column    <- str_replace_all(Column,"RT @[a-z,A-Z]*: ","")
 #Remove @ tagging
@@ -35,9 +35,10 @@ Corpus    <- tm_map(Corpus, content_transformer(removeURL))
 #remove white space
 Corpus    <- tm_map(Corpus, stripWhitespace)
 #remove numbers
-Corpus <- tm_map(Corpus, content_transformer(removeNumbers))
+Corpus    <- tm_map(Corpus, content_transformer(removeNumbers))
 #remove punctuation
-Corpus <- tm_map(Corpus, content_transformer(removePunctuation))
+Corpus    <- tm_map(Corpus, content_transformer(removePunctuation))
+
 
 #problem with above function - is when @ is removed - tagging of people on Twitter is taken as words
 #Sentance makes less sense this way - need to remove words after @
@@ -49,7 +50,12 @@ TweetContentVector <- convert.tm.to.character(Corpus)
 #Replace TweetContent column with the clean version
 TweetsClean$TweetContent <- TweetContentVector
 
+#Strip hours from Tweetdate
+TweetsClean$TweetDate <- format(
+  as.POSIXct(TweetsClean$TweetDate,format='%Y-%m-%d %H:%M:%S'),
+  format='%Y-%m-%d')
+
+
 ############# CSV export ###############
 write.table(TweetsClean, file="R_Tweets_Clean_final.csv", sep=",", row.names=FALSE)
-#write.table( TweetsClean, rTweetsClean.csv, sep=",", col.names=F, row.names=F)
 
