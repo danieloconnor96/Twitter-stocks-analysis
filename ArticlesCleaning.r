@@ -62,9 +62,20 @@ NewsArticles$ArticleContent <- ArticleContentClean
 
 
 ############# CSV export ###############
-write.table(NewsArticles, file="Articles_Clean_final.csv", sep=",", row.names=FALSE)
 
+#remove ave_sentiment column for DW import
+DwArticlesFile <- NewsArticles[,-7]
 
+#remove commas from Author column 
+#function found on https://stackoverflow.com/questions/48615346/removing-commas-from-strings-and-numbers
+MatrixNoCommas <- apply(DwArticlesFile, 2, function(x) gsub(",", "", gsub("([a-zA-Z]),", "\\1 ", x)))
+DFnoCommas <- as.data.frame(MatrixNoCommas)
+
+#Use Author var with removed commas
+DwArticlesFile$Author <- DFnoCommas$Author
+
+#export tweets with sentiment column for input to DW
+write.table(DwArticlesFile, file="NewsArticles_Clean_final.csv", sep=",", row.names=FALSE)
 
 
 
