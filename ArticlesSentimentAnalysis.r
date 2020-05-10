@@ -10,7 +10,7 @@ Articles <- NewsArticles$ArticleContent
 #Sentiment function
 sentimentArticle <- sentiment_by(NewsArticles$ArticleContent)
 
-#avg sentiment score - insert into DF
+#Sentiment score - insert into DF
 NewsArticles$ave_sentiment <- sentimentArticle$ave_sentiment
 
 ArticleScore <- sentimentArticle$ave_sentiment
@@ -23,19 +23,11 @@ summary(sentimentArticle$ave_sentiment)
 NewsArticles$SentimentGroup <- NULL
 NewsArticles$SentimentGroup <- ifelse(ArticleScore > 0, "Positive",ifelse(ArticleScore == 0, "Neutral", "Negative"))
 
+#shapiro-wilk test for normality - Article sentiment
+shapiro.test(NewsArticles$ave_sentiment)
 
 ###############################################
-
-
-########### Visualisation ########### 
-qplot(sentimentArticle$ave_sentiment, 
-      geom="histogram", binwidth=0.1,main="News Article Sentiment Scores")
-
-#wordcloud - need to go back & remove - ' , "
-wordcloud(Articles, max.words=150, min.freq=10, random.order=F, colors=brewer.pal(8, "Dark2"))
-
-###############################################
-## Pearson's correlation coefficient ##
+## Spearman's correlation coefficient ##
 
 ### Hypotheseis ###
 ### H1: There is no linear relationship between News Articles & Stocks ###
@@ -69,15 +61,13 @@ PriceChange2      <- CorDFArticlesMax$PercentChange
 ArticleMaxSent    <- CorDFArticlesMax$MaxSent
 
 #Pearson correlation
-cor(PriceChange, ArticleSentiment,  method = "pearson", use = "complete.obs")
-cor(PriceChange2, ArticleMaxSent,  method = "pearson", use = "complete.obs")
-
+cor(PriceChange, ArticleSentiment,  method = "spearman", use = "complete.obs")
 
 #plot correlation
 #Between Daily price percentage change & sentiment score
 ggscatter(CorDFArticles, x = "PercentChange", y = "AvgSent", 
           add = "reg.line", conf.int = TRUE, 
-          cor.coef = TRUE, cor.method = "pearson",
+          cor.coef = TRUE, cor.method = "spearman",
           xlab = "Daily Price Change %", ylab = "Article Sentiment Score",
           add.params = list(color="red", fill="lightgray"))
 
