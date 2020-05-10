@@ -27,7 +27,7 @@ round3 <- function(x){round(x,3)}
 ColumnNamesT   <- colnames(TweetsClean)
 ColumnNamesA   <- colnames(NewsArticles)
 
-#descriptive/summary statistics
+#descriptive/summary statistics 
 DescriptivesTweets <- psych::describeBy(TweetsClean) %>% mutate(
   vars = ColumnNamesT) %>% select(-one_of("trimmed","mad")) %>%
   mutate_if(is.numeric, round3)
